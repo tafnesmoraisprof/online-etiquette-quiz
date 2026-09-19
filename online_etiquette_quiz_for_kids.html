@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Online Etiquette Quiz</title>
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#eef7ff;color:#24324a}
+  .wrap{max-width:850px;margin:0 auto;padding:24px}
+  .card{background:white;border-radius:24px;padding:26px;box-shadow:0 8px 25px rgba(30,70,110,.12)}
+  h1{text-align:center;margin:0 0 8px;font-size:32px}
+  .subtitle{text-align:center;color:#61718a;margin-bottom:22px}
+  .progress{height:12px;background:#e7edf5;border-radius:10px;overflow:hidden;margin-bottom:22px}
+  .bar{height:100%;width:14.28%;background:#6aa9ff;transition:.3s}
+  .picture{height:260px;border-radius:20px;background:#f4f9ff;display:flex;align-items:center;justify-content:center;margin-bottom:22px}
+  svg{max-width:95%;height:230px}
+  .q{font-size:23px;font-weight:700;line-height:1.3;margin-bottom:16px}
+  .answers{display:grid;gap:12px}
+  button.answer{border:3px solid #dce7f4;background:white;border-radius:16px;padding:14px 16px;font-size:18px;text-align:left;cursor:pointer;transition:.15s}
+  button.answer:hover{background:#f1f7ff;border-color:#8abaff}
+  button.answer:disabled{cursor:default}
+  .correct{background:#e8f8e9!important;border-color:#54b968!important}
+  .wrong{background:#fff0f0!important;border-color:#ef7777!important}
+  .feedback{min-height:28px;font-size:17px;font-weight:600;margin:15px 0}
+  .next{display:none;margin:10px auto 0;border:0;border-radius:14px;background:#3478db;color:white;padding:13px 25px;font-size:18px;font-weight:bold;cursor:pointer}
+  .result{text-align:center;display:none}
+  .score{font-size:42px;font-weight:800;margin:15px}
+  .restart{border:0;border-radius:14px;background:#3478db;color:#fff;padding:13px 25px;font-size:18px;font-weight:bold;cursor:pointer}
+  .tiny{font-size:13px;color:#718096;text-align:center;margin-top:18px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <h1>🌐 Online Etiquette Quiz</h1>
+    <div class="subtitle">Choose the best answer. Be kind online!</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <div id="quiz"></div>
+    <div id="result" class="result"></div>
+    <div class="tiny">Made for young English learners</div>
+  </div>
+</div>
+
+<script>
+const questions = [
+{
+q:"What is online etiquette?",
+opts:["How to read messages online.","How to be polite online.","How to be rude online.","How to play games online."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<rect x="75" y="25" width="350" height="175" rx="22" fill="#dceeff" stroke="#3478db" stroke-width="7"/>
+<circle cx="155" cy="100" r="38" fill="#ffd3b6"/><circle cx="145" cy="94" r="5"/><circle cx="166" cy="94" r="5"/>
+<path d="M142 116 Q155 128 170 116" fill="none" stroke="#333" stroke-width="5"/>
+<path d="M210 70 h155 a18 18 0 0 1 18 18 v55 a18 18 0 0 1-18 18 h-155 a18 18 0 0 1-18-18 V88 a18 18 0 0 1 18-18" fill="#fff"/>
+<text x="230" y="108" font-size="25" fill="#3478db">Be kind!</text><text x="230" y="140" font-size="25">😊 💬</text>
+</svg>`
+},
+{
+q:"Who are you talking to in a group chat?",
+opts:["Invented people.","Real people.","Computers.","Video game characters."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<circle cx="120" cy="90" r="35" fill="#ffd3b6"/><circle cx="250" cy="90" r="35" fill="#e9b99b"/><circle cx="380" cy="90" r="35" fill="#ffd3b6"/>
+<path d="M70 190 Q120 135 170 190" fill="#6aa9ff"/><path d="M200 190 Q250 135 300 190" fill="#8dd3a7"/><path d="M330 190 Q380 135 430 190" fill="#ffbd70"/>
+<rect x="190" y="25" width="120" height="45" rx="20" fill="#fff" stroke="#3478db" stroke-width="5"/>
+<text x="214" y="56" font-size="22">💬 Chat!</text>
+</svg>`
+},
+{
+q:"Why is it a good idea to read a message before you send it?",
+opts:["So you can add more exclamation marks.","So you can think about the reader's reaction.","So you can make it longer.","So you can send it faster."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<rect x="80" y="35" width="340" height="145" rx="22" fill="#fff" stroke="#3478db" stroke-width="6"/>
+<text x="110" y="80" font-size="25">Hi! Are you OK?</text>
+<text x="110" y="120" font-size="25">😊  ❤️  👍</text>
+<circle cx="380" cy="175" r="32" fill="#ffd45c"/><path d="M365 175 l12 12 22-27" fill="none" stroke="#3478db" stroke-width="7"/>
+</svg>`
+},
+{
+q:"You decide that your message isn't kind. What's the best thing to do?",
+opts:["Send it immediately.","Don't send it.","Send it and say you're sorry.","Send it many times."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<rect x="100" y="35" width="300" height="135" rx="20" fill="#fff" stroke="#ef7777" stroke-width="6"/>
+<text x="145" y="85" font-size="24">This message</text><text x="175" y="120" font-size="24">isn't kind. 😕</text>
+<circle cx="250" cy="190" r="27" fill="#ef7777"/><path d="M235 175 l30 30 M265 175 l-30 30" stroke="white" stroke-width="7"/>
+</svg>`
+},
+{
+q:"When I post on a group chat, is it OK to tell jokes all the time?",
+opts:["True. My jokes are always funny.","False. Jokes can hurt people.","False. Nobody likes jokes.","True. Group chats are only for jokes."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<rect x="75" y="30" width="350" height="160" rx="24" fill="#f9edff" stroke="#9a62c9" stroke-width="6"/>
+<text x="125" y="85" font-size="30">😂 😂 😂</text>
+<text x="110" y="130" font-size="22">Funny sometimes...</text>
+<text x="130" y="162" font-size="22">but think of others!</text>
+</svg>`
+},
+{
+q:"Is there a problem with using CAPITAL LETTERS and lots of exclamation marks?",
+opts:["No, it's OK.","Yes, it can seem rude.","No, it's very funny.","Yes, because messages cannot have punctuation."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<rect x="70" y="35" width="360" height="150" rx="20" fill="#fff4f4" stroke="#ef7777" stroke-width="6"/>
+<text x="100" y="95" font-size="32" font-weight="bold">STOP!!!!!!!</text>
+<text x="125" y="140" font-size="25">😡 It can feel like shouting.</text>
+</svg>`
+},
+{
+q:"What's the best thing to do when someone asks for some help?",
+opts:["Ignore the message.","Reply to the message.","Shout at the person.","Send an unrelated joke."],
+ans:1,
+pic:`<svg viewBox="0 0 500 230">
+<circle cx="150" cy="95" r="38" fill="#ffd3b6"/><circle cx="350" cy="95" r="38" fill="#e9b99b"/>
+<path d="M105 190 Q150 135 195 190" fill="#6aa9ff"/><path d="M305 190 Q350 135 395 190" fill="#8dd3a7"/>
+<rect x="155" y="35" width="190" height="48" rx="18" fill="#fff" stroke="#3478db" stroke-width="5"/>
+<text x="178" y="67" font-size="22">Can you help? 🙏</text>
+<path d="M220 120 Q250 145 280 120" fill="none" stroke="#3478db" stroke-width="6"/>
+</svg>`
+}
+];
+
+let current=0, score=0;
+function render(){
+  if(current>=questions.length){showResult();return;}
+  const x=questions[current];
+  document.getElementById("bar").style.width=((current+1)/questions.length*100)+"%";
+  document.getElementById("quiz").innerHTML=`
+    <div class="picture">${x.pic}</div>
+    <div class="q">${current+1}. ${x.q}</div>
+    <div class="answers">${x.opts.map((o,i)=>`<button class="answer" onclick="answer(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join("")}</div>
+    <div class="feedback" id="feedback"></div>
+    <button class="next" id="next" onclick="nextQ()">${current===questions.length-1?"See my score":"Next question"} →</button>`;
+}
+function answer(i){
+  const x=questions[current], btns=document.querySelectorAll(".answer");
+  btns.forEach(b=>b.disabled=true);
+  if(i===x.ans){
+    score++; btns[i].classList.add("correct");
+    document.getElementById("feedback").textContent="⭐ Great job! That's the best answer.";
+  }else{
+    btns[i].classList.add("wrong"); btns[x.ans].classList.add("correct");
+    document.getElementById("feedback").textContent="💡 Not quite! Think about being kind and respectful online.";
+  }
+  document.getElementById("next").style.display="block";
+}
+function nextQ(){current++;render();}
+function showResult(){
+  document.getElementById("quiz").style.display="none";
+  document.getElementById("bar").style.width="100%";
+  let msg=score>=6?"🌟 Excellent! You are an online etiquette expert!":score>=4?"👏 Good job! Keep practicing your online manners!":"💪 Nice try! Review the questions and try again!";
+  document.getElementById("result").style.display="block";
+  document.getElementById("result").innerHTML=`<div style="font-size:70px">🏆</div><h2>Quiz Complete!</h2><div class="score">${score} / ${questions.length}</div><p>${msg}</p><button class="restart" onclick="location.reload()">Try Again</button>`;
+}
+render();
+</script>
+</body>
+</html>
